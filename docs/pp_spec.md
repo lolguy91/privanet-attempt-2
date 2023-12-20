@@ -1,6 +1,7 @@
 # Privanet Protocol Specification
 # WARNING: This initial version has been made with the use of ChatGPT, correction may be required
-https://chat.openai.com/share/c497cc94-a958-47a9-9b7c-5ea298976db2
+[ChatGPT convo found here](https://chat.openai.com/share/6d97b261-7769-4a95-bee4-0157a8ae8e07)
+
 ## 1. Introduction
 
 The Privanet Protocol (PP) facilitates communication in a serverless mesh network, allowing nodes to interact directly without relying on centralized servers.
