@@ -9,13 +9,13 @@
 #include <time.h>
 #include <pthread.h>
 
-#define PT_BEAM 0x01
-#define PT_IDENT 0x02
-#define PT_RESP_IDENT 0x03
-#define PT_TEXT_MSG 0x04
-#define BEAM_MAGICNUM 0xFFFFFFFFFFFFFFFF
-#define BASE_PORT 64420
-#define MAX_SESSIONS 256
+#define PT_BEAM         0x00
+#define PT_IDENT        0x01
+#define PT_RESP_IDENT   0x02
+#define PT_TEXT_MSG     0x03
+#define BEAM_MAGICNUM   0xFFFFFFFFFFFFFFFF
+#define BASE_PORT       64420
+#define MAX_SESSIONS    256
 
 typedef struct {
     unsigned char type;

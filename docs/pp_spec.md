@@ -1,74 +1,76 @@
 # Privanet Protocol Specification
-# WARNING: This initial version has been made with the use of ChatGPT, correction may be required
+## WARNING: This initial version has been made with the use of ChatGPT, correction may be required
+### current version is **HR**(Human Revision) v0.00001
 [ChatGPT convo found here](https://chat.openai.com/share/6d97b261-7769-4a95-bee4-0157a8ae8e07)
 
-## 1. Introduction
 
-The Privanet Protocol (PP) facilitates communication in a serverless mesh network, allowing nodes to interact directly without relying on centralized servers.
+## 1. Overview
+The **PP**(**P**rivanet **P**rotocol) facilitates communication in a decentralized mesh network.The whole network can be thought of as a big graph of nodes(devices) and connections. Each node has one or more connections, allowing them to exchange data.</br>
+The speed of the data transfer can depend on:
+ - Number of connections
+ - Speed of the connections
+ - Type of the connections
+ - Connection diversity
 
-## 2. Protocol Overview
+Privanet heavily relies IP and/or Bluetooth for providing connectivity.</br>
+The protocol's current features:
+ - Node discovery
+ - Identity exchange
+ - Data transmission.
 
-Privanet operates on existing network protocols, utilizing IP and Bluetooth for node communication. The protocol includes mechanisms for node discovery, identity exchange, and the transmission of 512-byte unencrypted data payloads.
-
-## 3. Packet Structure
-
-All communication in Privanet is packet-based. Each packet comprises a header and data. The header includes a type identifier to distinguish different packet types.
-
+## 2. Packet Structure
+All communication in Privanet is packet-based. Each packet comprises a header and a body.
+### 2.0 Packet Header
+The header is just a type identifier lol.
 - **Packet Header**
   - 1 byte: Packet Type
-  - N bytes: Data (variable size)
+  - N bytes: Body(variable size)
 
-## 4. Packet Types
+### 2.1 Packet Types
+The Privanet protocol has `4` packet types
+```
+#define PT_BEAM         0x00 //Beam Packet
+#define PT_IDENT        0x01 //Identification Packet
+#define PT_RESP_IDENT   0x02 //Response Identification Packet
+#define PT_DATA         0x03 //Data Packet
+```
+### 2.2 Packet Body
 
-- **PT_BEAM (0x01):** Beam Packet
-  - Data: BEAM_MAGICNUM (8 bytes)
-  - Sent during node exploration for discovery.
+- **PT_BEAM** 
+  - Length (8 bytes)
+  - Body Content: BEAM_MAGICNUM
 
-- **PT_IDENT (0x02):** Identification Packet
-  - Data:
+- **PT_IDENT** 
+  - Length (262 bytes)
+  - Body Content:
     - BEAM_MAGICNUM (8 bytes) for verification
     - Sender's UUID (8 bytes)
-    - Sender's Hostname (up to 255 characters)
-  - Sent as a response to PT_BEAM during exploration.
+    - Sender's Hostname (up to 256 characters)
 
-- **PT_RESP_IDENT (0x03):** Response Identification Packet
-  - Data:
+- **PT_RESP_IDENT** 
+  - Length (262 bytes)
+  - Body Content:
     - BEAM_MAGICNUM (8 bytes) for verification
     - Sender's UUID (8 bytes)
-    - Sender's Hostname (up to 255 characters)
-  - Sent as a response to PT_IDENT during exploration.
+    - Sender's Hostname (up to 256 characters)
 
-- **PT_DATA (0x04):** Data Packet
-  - Data: Unencrypted payload (512 bytes)
-  - Used for transmitting unencrypted data between nodes.
+- **PT_DATA** 
+  - Length (516 bytes)
+  - Body Content: 
+    - Length (4 bytes)
+    - Unencrypted payload (512 bytes)
 
-## 5. Node Discovery
+## 3. Node Discovery
 
-During exploration, nodes send PT_BEAM packets for discovery. If a node receives a PT_BEAM packet, it responds with PT_IDENT. The sender then replies with PT_RESP_IDENT, establishing mutual identification.
+During exploration, the following things happen **in order**:
+ 1. Sender sends PT_BEAM packets to all possible neighbours.
+ 2. If a node receives a PT_BEAM packet, it responds with PT_IDENT.
+ 3. Sender then replies with PT_RESP_IDENT, establishing a connection.
 
-## 6. Data Transmission
-
-Nodes exchange unencrypted data using PT_DATA packets, with a fixed payload size of 512 bytes.
-
-## 7. Session Management
-
-Each node has a unique session ID based on the network protocol and port, used for addressing nodes in the mesh network.
-
-## 8. Additional Features (To Be Decided)
+## 4. Additional Features (To Be Decided)
 
 - **Find by UUID Feature:**
   - Reserved space for a feature allowing nodes to find each other based on UUID.
 
 - **Network Crawling:**
   - Reserved space for a mechanism to crawl the network and discover available nodes.
-
-- **Contact List Structure:**
-  - Reserved space for detailing the structure of a contact list, considering factors such as online status, last contact time, etc.
-
-## 9. Security Considerations
-
-Privanet currently lacks encryption mechanisms for data in transit. Caution is advised when using Privanet in untrusted network environments.
-
-## 10. Future Considerations
-
-Future iterations of Privanet may include additional features such as message acknowledgment, enhanced security measures, and support for additional network protocols.
