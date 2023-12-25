@@ -68,8 +68,3 @@ struct Page_header {
 ```
 - `sha256_checksum`: SHA256 checksum of the whole page.
 
-## Notes
-
-- Adjust the size of arrays and fields as needed based on specific requirements.
-- Implement additional functionalities based on the desired features of the blockchain system.
-
