@@ -67,6 +67,9 @@ During exploration, the following things happen **in order**:
  2. If a node receives a PT_BEAM packet, it responds with PT_IDENT.
  3. Sender then replies with PT_RESP_IDENT, establishing a connection.
 
+##### Current limitations
+- Nodes can discover each other only if both are on the same network
+
 ## 4. Additional Features (To Be Decided)
 
 - **Find by UUID Feature:**
