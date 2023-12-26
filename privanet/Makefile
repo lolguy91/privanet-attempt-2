@@ -1,5 +1,5 @@
 C_FILES := $(wildcard *.c)
-OBJ := $(C_FILES:%.c=$(BUILD_DIR)/blockchain/%.o)
+OBJ := $(C_FILES:%.c=$(BUILD_DIR)/privanet/%.o)
 
 CFLAGS := -Wall -Wextra -Wpedantic
 ifeq ($(DEBUG),y)
@@ -8,12 +8,12 @@ else
 CFLAGS := -O3
 endif
 
-all: $(BIN_DIR)/blockchain
+all: $(BIN_DIR)/privanet
 
-$(BIN_DIR)/blockchain: $(OBJ)
+$(BIN_DIR)/privanet: $(OBJ)
 	@mkdir -p $(@D)
-	@ld $(OBJ) -o $(BIN_DIR)/blockchain
+	@ld $(OBJ) -o $(BIN_DIR)/privanet
 
-$(BUILD_DIR)/blockchain/%.o: %.c
+$(BUILD_DIR)/privanet/%.o: %.c
 	@mkdir -p $(@D)
 	@gcc $(CFLAGS) -c $< -o $@
