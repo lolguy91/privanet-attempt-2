@@ -32,7 +32,7 @@ struct client {
 struct server network_create_server(int domain, int service, int protocol, u_long interface, int port, int backlog);
 struct client network_create_client(int domain, int service, int protocol, int port, u_long interface);
 
-void *network_server(void *hosts);
+void *network_server(void *known_hosts);
 void network_client(char *request, struct linked_list *known_hosts);
 
 /****
@@ -40,5 +40,6 @@ void network_client(char *request, struct linked_list *known_hosts);
  ****/
 
 char *__client_make_request(struct client *client, char *server_ip, char *request);
+void *__network_server_loop(void *arg);
 
 #endif /* __NETWORK_H_ */

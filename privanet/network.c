@@ -7,7 +7,17 @@
 #include <unistd.h>
 
 #include "network.h"
+
 #include "data/linkedlist.h"
+
+#include "system/thread_pool.h"
+
+struct server_arg {
+	struct server *server;
+	struct linked_list *known_hosts;
+
+	int client;
+};
 
 struct server network_create_server(int domain, int service, int protocol, u_long interface, int port, int backlog)
 {
@@ -54,36 +64,24 @@ struct client network_create_client(int domain, int service, int protocol, int p
 	return new_client;
 }
 
-void *network_server(void *hosts)
+void *network_server(void *known_hosts)
 {
-	struct linked_list *known_hosts = hosts;
-
 	struct server server = network_create_server(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 9999, 20);
 	struct sockaddr *address = (struct sockaddr *)&server.address;
 	socklen_t address_length = (socklen_t)sizeof(server.address);
 
+	struct thread_pool thread_pool = thread_pool_create(50);
+
 	printf("[*] Server started on port :%d\n", server.port);
 
-	while (1) {
-		int client = accept(server.socket, address, &address_length);
-		char *client_addr = inet_ntoa(server.address.sin_addr);
-		char request[256];
-		memset(request, 0, 256);
-		read(client, request, 255);
-		printf("Received %s from %s\n", request, client_addr);
-		close(client);
+	while(1) {
+		struct server_arg server_loop_arg;
+		server_loop_arg.client = accept(server.socket, address, &address_length);
+		server_loop_arg.server = &server;
+		server_loop_arg.known_hosts = known_hosts;
 
-		// Do we already know the client?
-		bool found = false;
-		for (int i = 0; i < known_hosts->length && !found; i++) {
-			if (strcmp(client_addr, linked_list_retrieve(known_hosts, i)) == 0) {
-				found = true;
-			}
-		}
-
-		if (!found) {
-			linked_list_insert(known_hosts, known_hosts->length, client_addr, sizeof(client_addr));
-		}
+		struct thread_job server_job = thread_job_create(__network_server_loop, &server_loop_arg);
+		thread_pool_add_work(&thread_pool, server_job);
 	}
 
 	return NULL;
@@ -114,4 +112,32 @@ char *__client_make_request(struct client *client, char *server_ip, char *reques
 	read(client->socket, response, 30000);
 
 	return response;
+}
+
+void *__network_server_loop(void *arg)
+{
+	struct server_arg *server_arg = arg;
+
+	char request[256];
+	memset(request, 0, 256);
+	read(server_arg->client, request, 256);
+	
+	char *client_addr = inet_ntoa(server_arg->server->address.sin_addr);
+
+	printf("Received %s from %s\n", request, client_addr);
+	close(server_arg->client);
+
+	// Do we already know the client?
+	bool found = false;
+	for (int i = 0; i < server_arg->known_hosts->length && !found; i++) {
+		if (strcmp(client_addr, linked_list_retrieve(server_arg->known_hosts, i)) == 0) {
+			found = true;
+		}
+	}
+
+	if (!found) {
+		linked_list_insert(server_arg->known_hosts, server_arg->known_hosts->length, client_addr, sizeof(client_addr));
+	}
+
+	return NULL;
 }
