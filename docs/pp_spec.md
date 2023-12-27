@@ -69,6 +69,7 @@ During exploration, the following things happen **in order**:
 
 ##### Current limitations
 - Nodes can discover each other only if both are on the same network
+- Privanet currently only works on *NIX machines.
 
 ## 4. Additional Features (To Be Decided)
 

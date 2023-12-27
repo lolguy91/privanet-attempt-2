@@ -12,8 +12,8 @@ all: $(BIN_DIR)/blockchain
 
 $(BIN_DIR)/blockchain: $(OBJ)
 	@mkdir -p $(@D)
-	@ld $(OBJ) -o $(BIN_DIR)/blockchain
+	@clang $(OBJ) -o $(BIN_DIR)/blockchain
 
 $(BUILD_DIR)/blockchain/%.o: %.c
 	@mkdir -p $(@D)
-	@gcc $(CFLAGS) -c $< -o $@
+	@clang $(CFLAGS) -c $< -o $@

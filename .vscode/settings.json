@@ -6,6 +6,9 @@
         "array": "c",
         "string": "c",
         "string_view": "c",
-        "span": "c"
+        "span": "c",
+        "types.h": "c",
+        "unistd.h": "c",
+        "in.h": "c"
     }
 }

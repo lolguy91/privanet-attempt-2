@@ -12,8 +12,8 @@ all: $(BIN_DIR)/privanet
 
 $(BIN_DIR)/privanet: $(OBJ)
 	@mkdir -p $(@D)
-	@ld $(OBJ) -o $(BIN_DIR)/privanet
+	@clang $(OBJ) -lpthread -o $(BIN_DIR)/privanet
 
 $(BUILD_DIR)/privanet/%.o: %.c
 	@mkdir -p $(@D)
-	@gcc $(CFLAGS) -c $< -o $@
+	@clang $(CFLAGS) -c $< -o $@
