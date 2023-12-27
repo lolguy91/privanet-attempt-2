@@ -1,11 +1,9 @@
 {
     "files.associations": {
-        "string.h": "c",
-        "cstdlib": "cpp",
-        "stdlib.h": "c",
-        "array": "c",
-        "string": "c",
-        "string_view": "c",
-        "span": "c"
-    }
+        "*.c": "c",
+        "*.h": "c",
+        "*.cpp": "cpp",
+        "*.hpp": "cpp",
+    },
+    "cmake.configureOnOpen": false
 }
