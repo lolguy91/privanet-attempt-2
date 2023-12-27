@@ -54,6 +54,18 @@ void linked_list_remove_node(struct linked_list *list, int index)
 	list->length -= 1;
 }
 
+void *linked_list_retrieve(struct linked_list *list, int index)
+{
+	struct node *cur = linked_list_iterate(list, index);
+
+	// NOTE: Is this needed?
+	if (cur) {
+		return cur->data;
+	} else {
+		return NULL;
+	}
+}
+
 struct node *linked_list_iterate(struct linked_list *list, int index)
 {
 	if (index < 0 || index >= list->length) {

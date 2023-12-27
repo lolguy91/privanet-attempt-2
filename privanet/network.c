@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 #include "network.h"
+#include "data/linkedlist.h"
 
 struct server network_create_server(int domain, int service, int protocol, u_long interface, int port, int backlog)
 {
@@ -52,8 +54,10 @@ struct client network_create_client(int domain, int service, int protocol, int p
 	return new_client;
 }
 
-void *network_server(void *arg)
+void *network_server(void *hosts)
 {
+	struct linked_list *known_hosts = hosts;
+
 	struct server server = network_create_server(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 9999, 20);
 	struct sockaddr *address = (struct sockaddr *)&server.address;
 	socklen_t address_length = (socklen_t)sizeof(server.address);
@@ -62,20 +66,37 @@ void *network_server(void *arg)
 
 	while (1) {
 		int client = accept(server.socket, address, &address_length);
+		char *client_addr = inet_ntoa(server.address.sin_addr);
 		char request[256];
 		memset(request, 0, 256);
 		read(client, request, 255);
-		printf("Received %s from %s\n", request, inet_ntoa(server.address.sin_addr));
+		printf("Received %s from %s\n", request, client_addr);
 		close(client);
+
+		// Do we already know the client?
+		bool found = false;
+		for (int i = 0; i < known_hosts->length && !found; i++) {
+			if (strcmp(client_addr, linked_list_retrieve(known_hosts, i)) == 0) {
+				found = true;
+			}
+		}
+
+		if (!found) {
+			linked_list_insert(known_hosts, known_hosts->length, client_addr, sizeof(client_addr));
+		}
 	}
 
 	return NULL;
 }
 
-void network_client(char *request)
+void network_client(char *request, struct linked_list *known_hosts)
 {
 	struct client client = network_create_client(AF_INET, SOCK_STREAM, 0, 9999, INADDR_ANY);
-	__client_make_request(&client, "127.0.0.1", request);
+
+	// send the request to everyone we know
+	for (int i = 0; i < known_hosts->length; i++) {
+		__client_make_request(&client, linked_list_retrieve(known_hosts, i), request);
+	}
 }
 
 char *__client_make_request(struct client *client, char *server_ip, char *request)

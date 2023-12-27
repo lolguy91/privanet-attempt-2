@@ -16,6 +16,7 @@ void linked_list_destroy(struct linked_list *list);
 
 void linked_list_insert(struct linked_list *list, int index, void *data, unsigned long size);
 void linked_list_remove_node(struct linked_list *list, int index);
+void *linked_list_retrieve(struct linked_list *list, int index);
 struct node *linked_list_iterate(struct linked_list *list, int index);
 
 #endif /* __LINKEDLIST_H_ */

@@ -4,6 +4,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+#include "data/linkedlist.h"
+
 struct server {
 	int domain;
 	int service;
@@ -30,8 +32,8 @@ struct client {
 struct server network_create_server(int domain, int service, int protocol, u_long interface, int port, int backlog);
 struct client network_create_client(int domain, int service, int protocol, int port, u_long interface);
 
-void *network_server(void *arg);
-void network_client(char *request);
+void *network_server(void *hosts);
+void network_client(char *request, struct linked_list *known_hosts);
 
 /****
  * PRIVATE FUNCTIONS
