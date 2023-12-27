@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "privanet.h"
 #include "network.h"
 
 #include "data/linkedlist.h"
@@ -118,9 +119,9 @@ void *__network_server_loop(void *arg)
 {
 	struct server_arg *server_arg = arg;
 
-	char request[256];
-	memset(request, 0, 256);
-	read(server_arg->client, request, 256);
+	char request[REQUEST_BUFFER_SIZE];
+	memset(request, 0, REQUEST_BUFFER_SIZE);
+	read(server_arg->client, request, REQUEST_BUFFER_SIZE);
 	
 	char *client_addr = inet_ntoa(server_arg->server->address.sin_addr);
 

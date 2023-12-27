@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "data/linkedlist.h"
+#include "privanet.h"
 #include "network.h"
 
 int main()
@@ -18,10 +19,10 @@ int main()
 	pthread_create(&thread_server, NULL, network_server, &known_hosts);
 	
 	while(1) {
-		char request[256];
-		memset(request, 0, 256);
+		char request[REQUEST_BUFFER_SIZE];
+		memset(request, 0, REQUEST_BUFFER_SIZE);
 		printf("REQUEST: ");
-		fgets(request, 256, stdin);
+		fgets(request, REQUEST_BUFFER_SIZE, stdin);
 		network_client(request, &known_hosts);
 	}
 
