@@ -1,4 +1,4 @@
-C_FILES := $(wildcard *.c)
+C_FILES := $(shell find . -type f -name "*.c")
 OBJ := $(C_FILES:%.c=$(BUILD_DIR)/privanet/%.o)
 
 CFLAGS := -Wall -Wextra -Wpedantic

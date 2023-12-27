@@ -4,10 +4,12 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#include "data/linkedlist.h"
 #include "network.h"
 
 int main()
 {
+	struct linked_list known_hosts = linked_list_create();
 	pthread_t thread_server;
 
 	// create server/client threads	
