@@ -9,7 +9,7 @@ struct queue {
 
 struct queue queue_create();
 void queue_destroy(struct queue *queue);
-void queue_push(struct queue *queue, void *ata, unsigned long size);
+void queue_push(struct queue *queue, void *data, unsigned long size);
 void *queue_peek(struct queue *queue);
 void queue_pop(struct queue *queue);
 
