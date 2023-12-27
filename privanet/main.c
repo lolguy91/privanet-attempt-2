@@ -1,16 +1,25 @@
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <pthread.h>
 #include <unistd.h>
 
-#include "discovery.h"
+#include "network.h"
 
 int main()
 {
-	pthread_t beam_listener_thread;
-	pthread_t beam_broadcast_thread;
-	pthread_create(&beam_listener_thread, NULL, beam_listener, NULL);
-	pthread_create(&beam_broadcast_thread, NULL, discovery_broadcast_beam, NULL);
-	while(1);
+	pthread_t thread_server;
+
+	// create server/client threads	
+	pthread_create(&thread_server, NULL, network_server, NULL);
+	
+	while(1) {
+		char request[256];
+		memset(request, 0, 256);
+		printf("REQUEST: ");
+		fgets(request, 256, stdin);
+		network_client(request);
+	}
+
 	return 0;
 }

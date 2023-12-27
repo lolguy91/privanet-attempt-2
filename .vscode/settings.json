@@ -9,6 +9,7 @@
         "span": "c",
         "types.h": "c",
         "unistd.h": "c",
-        "in.h": "c"
+        "in.h": "c",
+        "network.h": "c"
     }
 }

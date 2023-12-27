@@ -1,5 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "network.h"
 
-void node_connect()
+struct server network_create_server(int domain, int service, int protocol, u_long interface, int port, int backlog)
 {
+	struct server new_server;
+
+	new_server.domain = domain;
+	new_server.service = service;
+	new_server.protocol = protocol;
+	new_server.interface = interface;
+	new_server.port = port;
+	new_server.backlog = backlog;
+
+	new_server.address.sin_family = domain;
+	new_server.address.sin_port = htons(port);
+	new_server.address.sin_addr.s_addr = htonl(interface);
+
+	new_server.socket = socket(domain, service, protocol);
+	if (new_server.socket == 0) {
+		perror("sock connect");
+		exit(-1);
+	}
+
+	if ((bind(new_server.socket, (struct sockaddr *)&new_server.address, sizeof(new_server.address))) < 0) {
+		perror("sock bind");
+		exit(-2);
+	}
+
+	if (listen(new_server.socket, new_server.backlog) < 0) {
+		perror("listen start");
+		exit(-3);
+	}
+
+	return new_server;
+}
+
+struct client network_create_client(int domain, int service, int protocol, int port, u_long interface)
+{
+	struct client new_client;
+	new_client.domain = domain;
+	new_client.port = port;
+	new_client.interface = interface;
+	new_client.socket = socket(domain, service, protocol);
+
+	return new_client;
+}
+
+void *network_server(void *arg)
+{
+	struct server server = network_create_server(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 9999, 20);
+	struct sockaddr *address = (struct sockaddr *)&server.address;
+	socklen_t address_length = (socklen_t)sizeof(server.address);
+
+	printf("[*] Server started on port :%d\n", server.port);
+
+	while (1) {
+		int client = accept(server.socket, address, &address_length);
+		char request[256];
+		memset(request, 0, 256);
+		read(client, request, 255);
+		printf("Received %s from %s\n", request, inet_ntoa(server.address.sin_addr));
+		close(client);
+	}
+
+	return NULL;
+}
+
+void network_client(char *request)
+{
+	struct client client = network_create_client(AF_INET, SOCK_STREAM, 0, 9999, INADDR_ANY);
+	__client_make_request(&client, "127.0.0.1", request);
+}
+
+char *__client_make_request(struct client *client, char *server_ip, char *request)
+{
+	struct sockaddr_in server_address;
+	server_address.sin_family = client->domain;
+	server_address.sin_port = htons(client->port);
+	server_address.sin_addr.s_addr = (int)client->interface;
+
+	inet_pton(client->domain, server_ip, &server_address.sin_addr);
+	connect(client->socket, (struct sockaddr *)&server_address, sizeof(server_address));
+
+	send(client->socket, request, strlen(request), 0);
+	char *response = malloc(30000);
+	read(client->socket, response, 30000);
+
+	return response;
 }
