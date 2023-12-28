@@ -10,13 +10,20 @@ The speed of the data transfer can depend on:
  - Number of connections
  - Speed of the connections
  - Type of the connections
- - Connection diversity
 
-Privanet heavily relies IP and/or Bluetooth for providing connectivity.</br>
+PP's current connection methods:
+ - LAN
+ - WiFi Aware(Only mobile chipsets support this tho)
+ - Local-only hotspot
+ - WiFi Direct
+
 The protocol's current features:
  - Node discovery
  - Identity exchange
  - Data transmission.
+
+Here are a few parameters:
+ - Using port 56969 or 55556
 
 ## 2. Packet Structure
 All communication in Privanet is packet-based. Each packet comprises a header and a body.
@@ -28,7 +35,7 @@ The header is just a type identifier lol.
 
 ### 2.1 Packet Types
 The Privanet protocol has `4` packet types
-```
+```c
 #define PT_BEAM         0x00 //Beam Packet
 #define PT_IDENT        0x01 //Identification Packet
 #define PT_RESP_IDENT   0x02 //Response Identification Packet
