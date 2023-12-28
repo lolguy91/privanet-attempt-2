@@ -56,7 +56,7 @@ struct Block_header {
 ```
 
 - `timestamp`: Time when the block was created.
-- `prev_block_hash`: SHA256 hash of the previous block, only including the original(0th edit).
+- `prev_block_hash`: SHA-256 hash of the previous block, only including the original(0th edit).
 - `num_edits`: Number of edits following the header.
 
 ### Page
@@ -66,5 +66,5 @@ struct Page_header {
     unsigned int sha256_checksum[8];
 };
 ```
-- `sha256_checksum`: SHA256 checksum of the whole page.
+- `sha256_checksum`: SHA-256 checksum of the whole page.
 

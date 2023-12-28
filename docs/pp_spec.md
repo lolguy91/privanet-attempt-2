@@ -24,11 +24,18 @@ The protocol's current features:
 Here are a few parameters:
  - Using port 56969 or 55556
 
-## 2. Identification: UUIDs,Neighbour IDs and IP addresses
-- **UUID**: a unique ID of a device that makes sending packets private, yet effective
-- **Neighbour ID**: an index into a device's neighbour list, only used during handling, **NOT** included in any packets, if we ask you to, it is **our** fault and should be corrected
-- **IP address**: you prob alredy know hat dat is, we do both v4 and v6, andonly used for during handling, same as the prev.
+## 2. Identification: UUIDs,
+### 2.0 UUIDs, how to generate them
+ the **UUID** is a unique ID of a device that makes sending packets private, yet effective. they are used to uniqely identify a session, therefore they are as privae as they can be, since they get discarded when stopping the daemon or shutting down your PC.</br>
+ To generate them, take the SHA-256 hash of the following things stringified and concatanated:
+ - system time
+ - system MAC address
+ - Hardware RNG
 
+### 2.1 Neighbour IDs and IP addresses
+these ones are should **NOT** be sent inside packets, use UUIDs for that instead
+- **Neighbour ID**: an index into a device's neighbour list
+- **IP address**: they can be an ipv4 or ipv6 addresses, represent addresses from the outer network's perspective
 
 ## 3. Packet Structure
 All communication in Privanet is packet-based. Each packet comprises a header and a body.
