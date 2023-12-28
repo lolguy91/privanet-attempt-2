@@ -22,7 +22,7 @@ The protocol's current features:
  - Data transmission.
 
 Here are a few parameters:
- - Using port 56969 or 55556
+ - Using port 56969 or 42069
 
 ## 2. Identification: UUIDs,
 ### 2.0 UUIDs, how to generate them

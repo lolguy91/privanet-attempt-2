@@ -11,6 +11,13 @@ network.c:
 void network_connect(...);
 ```
 
+Private functions are prepended with two underscores.
+
+Example:
+```c
+void __network_private_function();
+```
+
 ---
 
 ## TODO
