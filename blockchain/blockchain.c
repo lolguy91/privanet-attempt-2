@@ -14,6 +14,7 @@ struct Block_header* get_block(void* page,int num){
             }
         }
     }
+    //TODO: Implement crypto/checking stuff
     return (struct Block_header*)curr;
 }
 
@@ -34,6 +35,7 @@ struct Edit_header* get_edit(struct Block_header* block,int num){
             curr += ((struct Field*)curr)->length;
         }
     }
+    //TODO: Implement crypto/checking stuff
     return (struct Edit_header*)curr;
 }
 struct Field* get_field(struct Edit_header* edit,int num){
