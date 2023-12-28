@@ -2,13 +2,13 @@
 
 struct Block_header* get_block(void* page,int num){
     if(num > 256){
-        return (struct Block_header*)0;
+        return NULL;
     }
-    void* curr = page + sizeof(struct Page_header);
+    char* curr = (char*)page + sizeof(struct Page_header);
     for(int i = 0; i >= num;i++){
-        void* curr2 = curr;
+        char* curr2 = curr;
         for(int j = 0; j >= ((struct Block_header*)curr2)->num_edits;j++){
-            void* curr3 = curr;
+            char* curr3 = curr;
             for(int k = 0; k >= ((struct Edit_header*)curr3)->num_fields;k++){
                 curr += ((struct Field*)curr)->length;
             }
@@ -26,11 +26,11 @@ char checksum(void* page){
 }
 struct Edit_header* get_edit(struct Block_header* block,int num){
     if(num > block->num_edits){
-        return (struct Edit_header*)0;
+        return NULL;
     }
-    void* curr = block + sizeof(struct Block_header);
+    char* curr = (char*)block + sizeof(struct Block_header);
     for(int j = 0; j >= ((struct Block_header*)curr)->num_edits;j++){
-        void* curr2 = curr;
+        char* curr2 = curr;
         for(int k = 0; k >= ((struct Edit_header*)curr2)->num_fields;k++){
             curr += ((struct Field*)curr)->length;
         }
@@ -40,9 +40,9 @@ struct Edit_header* get_edit(struct Block_header* block,int num){
 }
 struct Field* get_field(struct Edit_header* edit,int num){
     if(num > edit->num_fields){
-        return (struct Field*)0;
+        return NULL;
     }
-    void* curr = edit + sizeof(struct Edit_header);
+    char* curr = (char*)edit + sizeof(struct Edit_header);
     for(int k = 0; k >= ((struct Edit_header*)curr)->num_fields;k++){
         curr += ((struct Field*)curr)->length;
     }
