@@ -3,7 +3,6 @@
 ### current version is **HR**(Human Revision) v0.00001
 [ChatGPT convo found here](https://chat.openai.com/share/6d97b261-7769-4a95-bee4-0157a8ae8e07)
 
-
 ## 1. Overview
 The **PP**(**P**rivanet **P**rotocol) facilitates communication in a decentralized mesh network.The whole network can be thought of as a big graph of nodes(devices) and connections. Each node has one or more connections, allowing them to exchange data.</br>
 The speed of the data transfer can depend on:
@@ -25,15 +24,21 @@ The protocol's current features:
 Here are a few parameters:
  - Using port 56969 or 55556
 
-## 2. Packet Structure
+## 2. Identification: UUIDs,Neighbour IDs and IP addresses
+- **UUID**: a unique ID of a device that makes sending packets private, yet effective
+- **Neighbour ID**: an index into a device's neighbour list, only used during handling, **NOT** included in any packets, if we ask you to, it is **our** fault and should be corrected
+- **IP address**: you prob alredy know hat dat is, we do both v4 and v6, andonly used for during handling, same as the prev.
+
+
+## 3. Packet Structure
 All communication in Privanet is packet-based. Each packet comprises a header and a body.
-### 2.0 Packet Header
+### 3.0 Packet Header
 The header is just a type identifier lol.
 - **Packet Header**
   - 1 byte: Packet Type
   - N bytes: Body(variable size)
 
-### 2.1 Packet Types
+### 3.1 Packet Types
 The Privanet protocol has `4` packet types
 ```c
 #define PT_BEAM         0x00 //Beam Packet
@@ -41,7 +46,7 @@ The Privanet protocol has `4` packet types
 #define PT_RESP_IDENT   0x02 //Response Identification Packet
 #define PT_DATA         0x03 //Data Packet
 ```
-### 2.2 Packet Body
+### 3.2 Packet Body
 
 - **PT_BEAM** 
   - Length (8 bytes)
@@ -67,18 +72,13 @@ The Privanet protocol has `4` packet types
     - Length (4 bytes)
     - Unencrypted payload (512 bytes)
 
-## 3. Node Discovery
-
+## 4. Node Discovery
 During exploration, the following things happen **in order**:
- 1. Sender sends PT_BEAM packets to all possible neighbours.
- 2. If a node receives a PT_BEAM packet, it responds with PT_IDENT.
- 3. Sender then replies with PT_RESP_IDENT, establishing a connection.
+ 1. Sender sends **PT_BEAM** packets to all possible neighbours.
+ 2. If a node receives a **PT_BEAM** packet, it responds with PT_IDENT.
+ 3. Sender then replies with **PT_RESP_IDENT**, establishing a connection.
 
-##### Current limitations
-- Nodes can discover each other only if both are on the same network
-- Privanet currently only works on *NIX machines.
-
-## 4. Additional Features (To Be Decided)
+## 5. Additional Features (To Be Decided)
 
 - **Find by UUID Feature:**
   - Reserved space for a feature allowing nodes to find each other based on UUID.
