@@ -10,7 +10,7 @@ This specification outlines the structure of a basic blockchain system consistin
 
 ```c
 struct Field {
-    FieldType type;
+    char type;
     unsigned long long length;
     union {
         char data_str;
@@ -50,7 +50,7 @@ A block is a collection of edits, and has the following header:
 ```c
 struct Block_header {
     unsigned long long timestamp;
-    unsigned in num_edits;
+    unsigned int num_edits;
     unsigned char prev_block_hash[SHA256_DIGEST_LENGTH];
 };
 ```

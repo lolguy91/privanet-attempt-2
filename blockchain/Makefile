@@ -8,11 +8,11 @@ else
 CFLAGS := -O3
 endif
 
-all: $(BIN_DIR)/blockchain
+all: $(BIN_DIR)/blockchain.a
 
-$(BIN_DIR)/blockchain: $(OBJ)
+$(BIN_DIR)/blockchain.a: $(OBJ)
 	@mkdir -p $(@D)
-	@clang $(OBJ) -o $(BIN_DIR)/blockchain
+	@ar -r $(BIN_DIR)/blockchain.a $(OBJ)
 
 $(BUILD_DIR)/blockchain/%.o: %.c
 	@mkdir -p $(@D)
