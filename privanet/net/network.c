@@ -6,12 +6,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "privanet.h"
+#include "../privanet.h"
 #include "network.h"
+#include "p2p.h"
 
-#include "data/linkedlist.h"
+#include "../data/linkedlist.h"
 
-#include "system/thread_pool.h"
+#include "../system/thread_pool.h"
 
 struct server_arg {
 	struct server *server;
@@ -65,9 +66,9 @@ struct client network_create_client(int domain, int service, int protocol, int p
 	return new_client;
 }
 
-void *network_server(void *known_hosts)
+void *network_server(void *arg)
 {
-	struct server server = network_create_server(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 9999, 20);
+	struct server server = network_create_server(AF_INET, SOCK_STREAM, 0, INADDR_ANY, PRIVANET_PORT, 20);
 	struct sockaddr *address = (struct sockaddr *)&server.address;
 	socklen_t address_length = (socklen_t)sizeof(server.address);
 
@@ -79,7 +80,7 @@ void *network_server(void *known_hosts)
 		struct server_arg server_loop_arg;
 		server_loop_arg.client = accept(server.socket, address, &address_length);
 		server_loop_arg.server = &server;
-		server_loop_arg.known_hosts = known_hosts;
+		server_loop_arg.known_hosts = arg;
 
 		struct thread_job server_job = thread_job_create(__network_server_loop, &server_loop_arg);
 		thread_pool_add_work(&thread_pool, server_job);
@@ -88,13 +89,60 @@ void *network_server(void *known_hosts)
 	return NULL;
 }
 
-void network_client(char *request, struct linked_list *known_hosts)
+void *network_server_no_multithreading(void *arg)
 {
-	struct client client = network_create_client(AF_INET, SOCK_STREAM, 0, 9999, INADDR_ANY);
+	struct p2p *p2p = arg;
+	struct server server = network_create_server(p2p->domain, p2p->service, p2p->protocol, p2p->interface, p2p->port, 20);
+	struct sockaddr *address = (struct sockaddr *)&p2p->server.address;
+	socklen_t address_length = (socklen_t)sizeof(server.address);
+
+	struct thread_pool thread_pool = thread_pool_create(50);
+
+	printf("[*] Server started on port :%d\n", server.port);
+
+	while(1) {
+		int client = accept(server.socket, address, &address_length);
+
+		char request[REQUEST_BUFFER_SIZE];
+		memset(request, 0, REQUEST_BUFFER_SIZE);
+		read(client, request, REQUEST_BUFFER_SIZE);
+
+		char *client_addr = inet_ntoa(p2p->server.address.sin_addr);
+
+		printf("Received %s from %s\n", request, client_addr);
+		close(client);
+
+		// Do we already know the client?
+		bool found = false;
+		for (int i = 0; i < p2p->known_hosts.length && !found; i++) {
+			if (strcmp(client_addr, linked_list_retrieve(&p2p->known_hosts, i)) == 0) {
+				found = true;
+			}
+		}
+
+		if (!found) {
+			linked_list_insert(&p2p->known_hosts, p2p->known_hosts.length, client_addr, sizeof(client_addr));
+		}
+	}
+
+	return NULL;
+}
+
+void *network_client(void *arg)
+{
+	struct p2p *p2p = arg;
 
 	// send the request to everyone we know
-	for (int i = 0; i < known_hosts->length; i++) {
-		__client_make_request(&client, linked_list_retrieve(known_hosts, i), request);
+	while (1) {
+		struct client client = network_create_client(p2p->domain, p2p->service, p2p->protocol, p2p->port, p2p->interface);
+		
+		char request[REQUEST_BUFFER_SIZE];
+		memset(request, 0, REQUEST_BUFFER_SIZE);
+		fgets(request, 255, stdin);
+
+		for (int i = 0; i < p2p->known_hosts.length; i++) {
+			__client_make_request(&client, linked_list_retrieve(&p2p->known_hosts, i), request);
+		}
 	}
 }
 
